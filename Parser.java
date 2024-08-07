@@ -34,13 +34,15 @@ public class Parser {
         // Shunting Yard Algorithm
         // Imprime el resultado de operar el input
         // System.out.println("Resultado: " + this.operandos.peek());
-
+        
         // Verifica si terminamos de consumir el input
         if(this.next != this.tokens.size()) {
             return false;
         }
         return true;
     }
+
+
 
     // Verifica que el id sea igual que el id del token al que apunta next
     // Si si avanza el puntero es decir lo consume.
@@ -74,6 +76,8 @@ public class Parser {
         }
         return false;
     }
+
+
 
     // Funcion que verifica la precedencia de un operador
     private int pre(Token op) {
@@ -129,13 +133,242 @@ public class Parser {
 
     }
 
+    // Gramtica corregida 
+
+    /* 
+    S :: = E ;											
+    E :: = T + E | T
+    T :: = N - T | N
+    N :: = J * N | J 
+    J:: = G / J | G
+    G:: = A % G | A
+    A:: = P ^ A | P
+    P :: = ~P | M 
+    M :: = ( E ) | number 
+    */
+    
+    // Funciones para la regla de produccion inical
+
     private boolean S() {
-        return E() && term(Token.SEMI);
+
+        
+        if((!E()) ||  (!term(Token.SEMI)) ){
+            return false;}
+
+        if(next != this.tokens.size() ) {
+            return false;
+        }
+        return true;
+       
     }
 
+
+
+
+    // Funciones para la 1era regla de produccion 
+
+    private boolean E1(){
+        return T() && term(Token.PLUS) && E();}
+
+    private boolean E2() {
+        return T();}
+
+
+
     private boolean E() {
+        int save = next;
+
+
+        next = save;
+        if(E1()) {return true;}
+
+        next = save;
+        if(E2()) {return true;}
+
         return false;
     }
 
-    /* TODO: sus otras funciones aqui */
+   
+
+    // Funciones para la 2da regla de produccion 
+
+    private boolean T1(){
+        return N() && term(Token.MINUS) && T();}
+
+    private boolean T2() {
+        return N();}
+
+
+
+    private boolean T() {
+        int save = next;
+
+
+        next = save;
+        if(T1()) {return true;}
+
+        next = save;
+        if(T2()) {return true;}
+
+        return false;
+    }
+
+   
+
+   
+    // Funciones para la 3era regla de produccion 
+
+
+
+    private boolean N1(){
+        return J() && term(Token.MULT) && N();}
+
+    private boolean N2() {
+        return J();}
+
+
+
+    private boolean N() {
+        int save = next;
+
+
+        next = save;
+        if(N1()) {return true;}
+
+        next = save;
+        if(N2()) {return true;}
+
+        return false;
+
+    }
+
+   
+     // Funciones para la 4ta regla de produccion 
+
+
+    private boolean J1(){
+        return G() && term(Token.DIV) && J();}
+
+    private boolean J2() {
+        return G();}
+
+
+
+    private boolean J() {
+        
+        int save = next;
+
+        next = save;
+        if(J1()) {return true;}
+
+        next = save;
+        if(J2()) {return true;}
+
+        return false;
+
+    }
+
+
+    // Funciones para la 5ta  regla de produccion 
+
+
+    private boolean G1(){
+        return A() && term(Token.MOD) && G();}
+
+    private boolean G2() {
+        return A();}
+
+    private boolean G() {
+        int save = next;
+
+        next = save;
+        if(G1()) {return true;}
+
+        next = save;
+        if(G2()) {return true;}
+
+        return false;
+    }
+
+
+
+    // Funciones para la 6ta regla de produccion 
+
+
+
+    private boolean A1(){
+        return P() && term(Token.EXP) && A();}
+
+    private boolean A2() {
+        return P();}
+
+
+ 
+    private boolean A() {
+        int save = next;
+
+        next = save;
+        if(A1()) {return true;}
+
+        next = save;
+        if(A2()) {return true;}
+
+        return false;
+    }
+
+
+
+    // Funciones para la septima regla de produccion 
+
+
+
+    private boolean P1(){
+        return  term(Token.UNARY)  &&  P()   ;} 
+
+    private boolean P2() {
+        return M();}
+
+
+
+    private boolean P() {
+        int save = next;
+
+        next = save;
+        if(P1()) {return true;}
+
+        next = save;
+        if(P2()) {return true;}
+
+        return false;
+    }
+
+
+
+    // Funciones para la octava regla de produccion 
+
+
+    private boolean M1(){
+        return  term(Token.LPAREN)  &&  E()   &&  term(Token.RPAREN);} 
+
+    private boolean M2() {
+        return term(Token.NUMBER);}
+
+
+
+    private boolean M() {
+        int save = next;
+
+        next = save;
+        if(M1()) {return true;}
+
+        next = save;
+        if(M2()) {return true;}
+
+        return false;
+    }
+
+
+
+
+
 }
